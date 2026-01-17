@@ -1,0 +1,12 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "lsp": false,
+  "permission": {
+  },
+  "mcp": {
+    "asana": {
+      "type": "remote",
+      "url": "https://mcp.asana.com/sse"
+    }
+  }
+}

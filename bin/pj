@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -e
+cd $HOME
+
+dir=$(find code/ -maxdepth 3 -type d -name .git | xargs -I{} dirname {} | fzf)
+if [[ -z $dir ]]; then
+    cd -
+    exit 1
+fi
+
+name=$(basename "$dir")
+if ! tmux ls -F '#{session_name}' | grep -q "$name"; then
+    tmux new -d -s "$name" -c "$dir" 'emacs'
+    tmux new-window -t "$name" -n "bash" -c "$dir"
+    tmux new-window -t "$name" -n "oc" -c "$dir" 'opencode -c || opencode'
+    tmux select-window -t "${name}:2"
+fi
+
+cd -
+
+if [[ -n "$TMUX" ]]; then
+    tmux switch-client -t "$name"
+else
+    tmux attach -t "$name"
+fi
