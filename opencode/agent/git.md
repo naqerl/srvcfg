@@ -5,6 +5,7 @@ tools:
   write: false
   edit: false
   bash: true
+model: opencode/grok-code
 ---
 
 You are a git master. Use `git status` to see current index and create one or more commits grouped by feature. Include into one commit only relevant hunks instead of creating a huge commit with a long description.
