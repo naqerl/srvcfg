@@ -2,11 +2,31 @@
   "$schema": "https://opencode.ai/config.json",
   "lsp": false,
   "permission": {
+    "telegram_*": "ask",      
+    "telegram_list_topics": "allow",
+    "telegram_list_chats": "allow",
+    "telegram_get_history": "allow",
+    "telegram_list_messages": "allow"
+  },
+  "tools": {
+    "telegram*": false
   },
   "mcp": {
     "asana": {
       "type": "remote",
-      "url": "https://mcp.asana.com/sse"
+      "url": "https://mcp.asana.com/sse",
+      "enabled": true
+    },
+    "telegram": {
+      "type": "local",
+      "command": [
+        "uv",
+        "--directory",
+        "/home/user/code/clone/telegram-mcp",
+        "run",
+        "main.py"
+      ],
+      "enabled": false
     }
   }
 }
