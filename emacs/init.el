@@ -52,8 +52,9 @@
   (compilation-buffer-name-function (lambda (_) (concat "*" compile-command "*")))
   :bind
   ("<f8>" . recompile)
-  ("<f9>" . project-compile)
+  ("<f9>" . make)
   :config
+  (load (expand-file-name "make-completion" user-emacs-directory))
   (dolist (regex '('(biome-lint "^\\(.*\\):\\([0-9]+\\):\\([0-9]+\\)\s.*\s━+$" 1 2 3 2 1)
                  '(tsc "^\\(.*\\):\\([0-9]+\\):\\([0-9]+\\)\s-\serror\s.*$" 1 2 3 2 1)
                  '(ruff "^ *--> \\([^:]+\\):\\([0-9]+\\):\\([0-9]+\\)$" 1 2 3)))
@@ -128,6 +129,10 @@
 (use-package clipetty
   :ensure t
   :hook (after-init . global-clipetty-mode))
+(use-package golden-ratio
+  :ensure t
+  :config
+  (golden-ratio-mode 1))
 
 (use-package expand-region
   :defer 1
@@ -182,5 +187,18 @@ Stores markdown link to it in kill ring."
       (insert (format "<span id=\"#%s\">%s</span>" kebab-case contents))
       (kill-new (format "[%s](#%s)" contents kebab-case))
       (message "Link saved to kill ring"))))
+
+(use-package orderless
+  :ensure t
+  :custom
+  (completion-styles '(orderless basic))
+  (completion-category-defaults nil)
+  (completion-category-overrides '((file (styles partial-completion)))))
+
+
+(use-package dumb-jump
+  :ensure t
+  :config
+  (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
 
 (load-theme 'modus-vivendi t)
