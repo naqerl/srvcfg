@@ -42,10 +42,14 @@
 (defvar make-completion--prerequisites-column-width)
 
 ;;;###autoload
-(defun make ()
-  "Interactively select and run a Makefile target from the project."
-  (interactive)
-  (let* ((default-directory (project-root (project-current)))
+(defun make (prefix)
+  "Interactively select a Makefile target from the project and run it.
+
+With PREFIX argument (e.g. \[universal-argument]), prefill the compile
+command instead of running it immediately."
+  (interactive "P")
+  (let* ((project (project-current))
+         (default-directory (project-root project))
          (makefiles (make-completion--find-makefiles))
          (targets-alist
           (apply #'append
@@ -56,11 +60,17 @@
                                              (cons dir target)))
                                      (my-make-targets dir))))
                          makefiles)))
-         (selected (completing-read (concat "[" (project-name (project-current)) "] Makefile target: ") targets-alist)))
+         (selected (completing-read (concat "[" (project-name project) "] Makefile target: ") targets-alist)))
     (let* ((dir-target (alist-get selected targets-alist nil nil #'string=))
            (dir (car dir-target))
-           (target (cdr dir-target)))
-      (compile (format "make -C %s %s" (file-relative-name dir (project-root (project-current))) target)))))
+           (target (cdr dir-target))
+           (command (format "make -C %s %s"
+                            (file-relative-name dir (project-root project))
+                            target))
+           (compile-command command))
+      (if prefix
+          (call-interactively 'compile)
+        (compile command)))))
 
 (defun my-make-targets (dir)
   "Extract make targets from Makefile in DIR."
