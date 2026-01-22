@@ -2,7 +2,7 @@
 set -e
 cd $HOME
 
-dir=$(find code/ -maxdepth 3 -type d -name .git | xargs -I{} dirname {} | fzf)
+dir=$(find code/ -maxdepth 3 -type d -name .git | xargs -I{} dirname {} | fzf --reverse)
 if [[ -z $dir ]]; then
     cd -
     exit 1
