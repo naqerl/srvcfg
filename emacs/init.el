@@ -51,9 +51,12 @@
   (compilation-scroll-output t)
   (compilation-buffer-name-function (lambda (_) (concat "*" compile-command "*")))
   :bind
-  ("<f8>" . recompile)
+  ("<f8>" . user/recompile)
   ("<f9>" . make)
+  ("<f10>" . user/compile)
   :config
+  (defun user/compile () (interactive) (if (project-current) (project-compile) (compile)))
+  (defun user/recompile () (interactive) (if (project-current) (project-recompile) (recompile)))
   (load (expand-file-name "make-completion" user-emacs-directory))
   (dolist (regex '('(biome-lint "^\\(.*\\):\\([0-9]+\\):\\([0-9]+\\)\s.*\s━+$" 1 2 3 2 1)
                  '(tsc "^\\(.*\\):\\([0-9]+\\):\\([0-9]+\\)\s-\serror\s.*$" 1 2 3 2 1)
@@ -100,8 +103,6 @@
   ("C-M-n" . next-buffer))
 
 (use-package project
-  :custom
-  (project-mode-line t)
   :config
   ;; During the work many unrelated buffers to the current project files
   ;; are used, which lead to using of a wrong project or multiple

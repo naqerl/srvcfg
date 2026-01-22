@@ -49,7 +49,8 @@ With PREFIX argument (e.g. \[universal-argument]), prefill the compile
 command instead of running it immediately."
   (interactive "P")
   (let* ((project (project-current))
-         (default-directory (project-root project))
+         (default-directory (if project (project-root project) default-directory))
+         (compile (if project 'project-compile 'compile))
          (makefiles (make-completion--find-makefiles))
          (targets-alist
           (apply #'append
@@ -66,8 +67,8 @@ command instead of running it immediately."
            (target (cdr dir-target))
            (command (format "make -C %s %s"
                             (file-relative-name dir (project-root project))
-                            target))
-           (compile-command command))
+                            target)))
+      (setq compile-command command)
       (if prefix
           (call-interactively 'compile)
         (compile command)))))
