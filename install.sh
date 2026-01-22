@@ -1,4 +1,4 @@
-mkdir -p $HOME/.emacs.d $HOME/.cofig
+mkdir -p $HOME/.emacs.d $HOME/.config
 
 ln -s $PWD/emacs/* $HOME/.emacs.d/
 ln -s $PWD/tmux/tmux.conf $HOME/
