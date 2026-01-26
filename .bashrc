@@ -8,7 +8,7 @@ force_color_prompt=yes
 
 export GOPATH="$HOME/go"
 export PNPM_HOME="$HOME/.local/share/pnpm"
-export PATH="/usr/local/go/bin:$GOPATH/bin:$HOME/.local/bin:$PNPM_HOME:/home/user/.opencode/bin:$PATH"
+export PATH="/usr/local/go/bin:$GOPATH/bin:$HOME/.local/bin:$PNPM_HOME:$HOME/.opencode/bin:$HOME/.fzf/bin:$PATH"
 export OPENCODE_EXPERIMENTAL_PLAN_MODE=1
 export OPENCODE_ENABLE_EXA=false
 export EDITOR=emacs

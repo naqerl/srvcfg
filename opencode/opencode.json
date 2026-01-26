@@ -4,6 +4,11 @@
     "tavily": {
       "type": "remote",
       "url": "https://mcp.tavily.com/mcp/?tavilyApiKey=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"
+    },
+    "miro": {
+      "type": "remote",
+      "url": "https://mcp.miro.com/",
+      "oauth": {}
     }
   }
 }
