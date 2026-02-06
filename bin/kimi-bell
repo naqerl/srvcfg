@@ -1,0 +1,90 @@
+#!/bin/bash
+# kimi wrapper that sends bell only when window is not active
+# Usage: alias kimi='kimi-bell'
+
+# Store the original kimi command path
+KIMI_CMD=$(command -v kimi)
+
+# Run kimi with all arguments
+"$KIMI_CMD" "$@"
+EXIT_CODE=$?
+
+# Function to check if current tmux pane/window is active
+is_tmux_window_active() {
+    # Check if we're in tmux
+    if [ -z "$TMUX" ]; then
+        return 1  # Not in tmux, considered not active for bell purposes
+    fi
+    
+    # Check if current pane is active
+    local pane_active
+    pane_active=$(tmux display-message -p '#{pane_active}' 2>/dev/null)
+    if [ "$pane_active" != "1" ]; then
+        return 1  # Pane is not active
+    fi
+    
+    # Check if current window is active
+    local window_active
+    window_active=$(tmux display-message -p '#{window_active}' 2>/dev/null)
+    if [ "$window_active" != "1" ]; then
+        return 1  # Window is not active
+    fi
+    
+    # Check if session is attached and focused
+    local session_attached
+    session_attached=$(tmux display-message -p '#{session_attached}' 2>/dev/null)
+    if [ "$session_attached" != "1" ]; then
+        return 1  # Session is not attached
+    fi
+    
+    return 0  # Window is active
+}
+
+# Function to check if terminal window has focus (best effort)
+is_terminal_focused() {
+    # Try xdotool for X11
+    if command -v xdotool >/dev/null 2>&1 && [ -n "$DISPLAY" ]; then
+        local active_window
+        active_window=$(xdotool getactivewindow 2>/dev/null)
+        local current_window
+        current_window=$(xdotool getwindowfocus 2>/dev/null)
+        if [ -n "$active_window" ] && [ -n "$current_window" ]; then
+            if [ "$active_window" != "$current_window" ]; then
+                return 1  # Terminal window not focused
+            fi
+        fi
+    fi
+    
+    # Try osascript for macOS
+    if command -v osascript >/dev/null 2>&1; then
+        local is_frontmost
+        is_frontmost=$(osascript -e 'tell application "System Events" to return name of first application process whose frontmost is true' 2>/dev/null)
+        local term_name
+        if [ -n "$TERM_PROGRAM" ]; then
+            term_name="$TERM_PROGRAM"
+        else
+            term_name="Terminal"
+        fi
+        if [[ "$is_frontmost" != *"$term_name"* ]] && [[ "$is_frontmost" != *"Ghostty"* ]] && [[ "$is_frontmost" != *"Alacritty"* ]]; then
+            return 1  # Terminal not frontmost
+        fi
+    fi
+    
+    return 0  # Assume focused if we can't detect otherwise
+}
+
+# Main logic: send bell only if window is NOT active
+if ! is_tmux_window_active; then
+    # Send bell character
+    echo -ne '\a'
+    
+    # Also record bell for tmux status tracking if the script exists
+    if [ -n "$TMUX" ] && [ -x "$HOME/.tmux/scripts/add-bell.sh" ]; then
+        "$HOME/.tmux/scripts/add-bell.sh"
+    fi
+elif ! is_terminal_focused; then
+    # Terminal window not focused
+    echo -ne '\a'
+fi
+
+exit $EXIT_CODE

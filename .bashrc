@@ -31,3 +31,6 @@ monit() {
 
 alias codex="npx @openai/codex"
 
+# Use kimi-bell wrapper that only rings when window is not active
+alias kimi='kimi-bell'
+
