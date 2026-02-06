@@ -18,7 +18,7 @@
       tramp-use-scp-direct-remote-copying t
       remote-file-name-inhibit-auto-save-visited t
       split-width-threshold 1 ;; Prever side by side splits
-      next-screen-context-lines 7)
+      next-screen-context-lines 2)
 
 (set-terminal-coding-system 'utf-8)
 (set-keyboard-coding-system 'utf-8)
