@@ -15,4 +15,7 @@ TIMESTAMP=$(date -Iseconds)
 printf '{"session":"%s","window":%s,"name":"%s","time":"%s"}\n' \
     "$SESSION_NAME" "$WINDOW_INDEX" "$WINDOW_NAME" "$TIMESTAMP" >> "$BELL_FILE"
 
+# Refresh status bar to show the bell immediately
+tmux refresh-client -S
+
 exit 0

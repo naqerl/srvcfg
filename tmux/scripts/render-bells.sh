@@ -8,8 +8,16 @@ if [ ! -f "$BELL_FILE" ] || [ ! -s "$BELL_FILE" ]; then
     exit 0
 fi
 
+# Read bells and filter out those from non-existent sessions
 # Output format: 🔥session(count) 🔥session2(count)
 jq -r '.session' "$BELL_FILE" 2>/dev/null | \
     sort | \
     uniq -c | \
-    awk '{printf "🔔%s(%s) ", $2, $1}'
+    while read -r count session; do
+        # Only show if session still exists
+        if tmux has-session -t "$session" 2>/dev/null; then
+            printf "🔔%s(%s) " "$session" "$count"
+        fi
+    done
+
+exit 0

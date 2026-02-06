@@ -12,6 +12,9 @@ if [ -f "$BELL_FILE" ]; then
     # Remove matching entries
     jq -c "select(.session != \"$SESSION_NAME\" or .window != $WINDOW_INDEX)" "$BELL_FILE" > "$TEMP_FILE" 2>/dev/null
     mv "$TEMP_FILE" "$BELL_FILE"
+    
+    # Refresh status bar to clear the bell icon immediately
+    tmux refresh-client -S
 fi
 
 exit 0
