@@ -25,4 +25,9 @@ if [[ -n "$SSH_CLIENT" && -z "$TMUX" && -z "$INSIDE_EMACS" ]]; then
     tmux new -A -D -s main
 fi
 
+monit() {
+    watch -c 'sudo netstat -tlp | grep "tcp\s"; echo; free -h; echo; df -h | grep "/dev/sda1\s"; echo; podman ps | tail -n +2; echo; ps -e -o pid,%cpu,%mem,args --sort=-%mem | head -n 10'
+}
+
 alias codex="npx @openai/codex"
+
