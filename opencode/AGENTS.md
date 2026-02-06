@@ -4,6 +4,8 @@ When the user asks questions like "why", "what", "how", or any other information
 # Working in the project
 All projects include root Makefile and may include some inner Makefiles in the subdirectories. You should ALWAYS use them to build, lint, compile, verify, deploy or test things. So when you need to do anything like that, LOOK for the existing Makefiles and if you do not find, what exactly is required, then propose modification or creation of the corrseponding Makefiles. Also Makefiles use `include` directive and source all required dotenv files, so you can run any target freely without seeing required env vars. Assume, that all needed env vars will be included by make itself from `.env` file and try to run the first and investigate missing vars only after.
 
+CRITICAL: NEVER try to read or check `.env` files proactively. The `make` tool handles them. If a variable is missing, the command will fail naturally. Do not ask for permission to read secrets just to satisfy a dependency that `make` already handles.
+
 # Knowledge
 Use tavily MCP for web search for any info that should be fresh or unavailable locally like
 - Documentation

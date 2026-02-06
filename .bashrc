@@ -12,6 +12,10 @@ export PATH="/usr/local/go/bin:$GOPATH/bin:$HOME/.local/bin:$PNPM_HOME:$HOME/.op
 export OPENCODE_EXPERIMENTAL_PLAN_MODE=1
 export OPENCODE_ENABLE_EXA=false
 export EDITOR=emacs
+# Only set TERM if not already set (don't override tmux's TERM)
+if [ -z "$TERM" ] || [ "$TERM" = "dumb" ]; then
+    export TERM=xterm-ghostty
+fi
 
 env_path="$HOME/.env"
 test -f "$env_path" && source "$env_path"
@@ -20,3 +24,5 @@ test -f "$env_path" && source "$env_path"
 if [[ -n "$SSH_CLIENT" && -z "$TMUX" && -z "$INSIDE_EMACS" ]]; then
     tmux new -A -D -s main
 fi
+
+alias codex="npx @openai/codex"

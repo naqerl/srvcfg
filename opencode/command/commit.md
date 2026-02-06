@@ -2,7 +2,7 @@
 description: Commit current changes
 agent: git
 subtask: false
-model: opencode/gpt-5-nano
+model: kimi-for-coding/k2p5
 ---
 
 Analyze all current git changes and group them into logically connected classes.

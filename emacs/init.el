@@ -17,7 +17,19 @@
       remote-file-name-inhibit-locks t
       tramp-use-scp-direct-remote-copying t
       remote-file-name-inhibit-auto-save-visited t
-      split-width-threshold 1) ;; Prever side by side splits
+      split-width-threshold 1 ;; Prever side by side splits
+      next-screen-context-lines 7)
+
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+;; Terminal setup for tmux-direct (truecolor + italics support)
+(add-to-list 'term-file-aliases '("tmux-direct" . "xterm-direct"))
+(setq xterm-extra-capabilities '(invisible-text))
+
+;; Don't override TERM - use what tmux sets
+(setq frame-background-mode 'dark)
+(set-terminal-parameter nil 'background-mode 'dark)
+(toggle-enable-multibyte-characters t)
 
 (blink-cursor-mode 1)
 (electric-pair-mode 1)
@@ -92,6 +104,7 @@
   (call-interactively
    (if (region-active-p)
        'kill-region
+
        'backward-kill-word)))
 
 (use-package emacs
@@ -148,7 +161,12 @@
   (magit-status-buffer-switch-function 'switch-to-buffer)
   (magit-display-buffer-function 'magit-display-buffer-same-window-except-diff-v1)
   :bind
-  ("C-x g" . magit))
+  ("C-x g" . magit)
+  (:map magit-status-mode-map ("<backtab>" . magit-section-cycle-diffs)))
+
+(use-package embark
+  :ensure t
+  :bind (:map minibuffer-mode-map ("M-." . embark-export)))
 
 (use-package change-inner
   :ensure t
@@ -202,4 +220,16 @@ Stores markdown link to it in kill ring."
   :config
   (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
 
-(load-theme 'modus-vivendi t)
+(use-package doom-themes
+  :ensure t
+  :config
+  (load-file (expand-file-name "compline-theme.el" user-emacs-directory))
+  (load-theme 'compline t))
+
+
+(load "term/xterm")
+
+;; Enable 24-bit color for tmux-direct
+(defun terminal-init-tmux-direct ()
+  (xterm-register-default-colors)
+  (tty-set-up-initial-frame-faces))
