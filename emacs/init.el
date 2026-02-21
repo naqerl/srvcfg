@@ -142,7 +142,7 @@
 (use-package f :ensure t)
 (use-package clipetty
   :ensure t
-  :hook (after-init . global-clipetty-mode))
+  :bind ("M-w" . clipetty-kill-ring-save))
 (use-package golden-ratio
   :ensure t
   :config

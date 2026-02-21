@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+sudo netstat -tlpn | grep "tcp\s"
+echo
+free -h
+echo
+df -h | grep "/dev/sda1\s"
+echo
+podman ps | tail -n +2
+echo
+ps -e -o pid,%cpu,%mem,args --sort=-%mem | head -n 10

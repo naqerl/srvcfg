@@ -20,24 +20,41 @@ Only use this skill when:
 
 1. **Check git status** - See what changes are present (staged/unstaged)
 2. **Analyze changes** - Review diffs to understand what changed
-3. **Group logically** - Organize changes into logically connected groups
+3. **Group logically** - Organize changes into logically connected groups by feature/area
 4. **Stage and commit** - Add files and create commits with descriptive messages
 
 ## Commit Message Guidelines
 
-- Use semantic prefixes based on feature/area (e.g., `docs:`, `project:`, `customers:`)
+You are a git master. Use `git status` to see current index and create one or more commits grouped by feature. Include into one commit only relevant hunks instead of creating a huge commit with a long description.
+
+- Use semantic prefixes based on feature/area (e.g., `docs:`, `project:`, `customers:`, `core:`)
 - Group related changes into single commits
+- Include only relevant hunks in each commit
 - Avoid generic prefixes like `feat:`, `chore:`, `fix:`, `refactor:`, `add:`
-- Examples:
-  - `docs: actualized spec for feature A`
-  - `customers: UI shows actual balance`
-  - `project: make target for CD`
+
+### Examples:
+- `docs: actualized spec for feature A`
+- `customers: UI shows actual balance`
+- `project: make target for CD`
+
+### Prefix Usage:
+- **docs** - For markdown or any other doc files
+- **project** - For any project-wide developer experience based changes
+- **<feature-name>** - For other changes, use main feature name from the file path (e.g., `core`, `customers`, `api`)
 
 ## Steps
 
 1. Run `git status` to see current state
 2. Run `git diff` to understand changes
-3. Group changes by logical connection/area
-4. Stage files for each group (`git add <files>`)
-5. Create commit with descriptive message (`git commit -m "<message>"`)
-6. Repeat until all changes are committed
+3. Analyze all changes and classify them into logically connected groups
+4. Group changes by logical connection/area/feature
+5. Stage files for each group (`git add <files>` or `git add -p` for partial staging)
+6. Create commit with descriptive message (`git commit -m "<message>"`)
+7. Repeat until all changes are committed
+
+## Important Notes
+
+- Analyze all current git changes and group them into logically connected classes
+- All changes should be classified and committed in the end
+- Make focused, atomic commits rather than large monolithic commits
+- Do not use words like `feat`, `chore`, `fix`, `refactor` or `add` as the first word in the commit

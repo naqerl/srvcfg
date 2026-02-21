@@ -1,10 +1,12 @@
 " Disable swap files
 set noswapfile
+set spell
 
 " Install plugins
 call plug#begin()
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
+Plug 'tpope/vim-fugitive'
 call plug#end()
 
 " Copy to system clipboard through SSH
