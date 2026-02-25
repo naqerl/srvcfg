@@ -114,24 +114,6 @@
   ("C-M-p" . previous-buffer)
   ("C-M-n" . next-buffer))
 
-(use-package project
-  :config
-  ;; During the work many unrelated buffers to the current project files
-  ;; are used, which lead to using of a wrong project or multiple
-  ;; "choose project" prompts. This hack sets a global project
-  ;; and uses it until project switched intentionally
-  (defvar user/global-project nil
-    "Use single project per frame.")
-  (defun user/set-global-project (dir)
-    (setq user/global-project dir))
-  (defun user/get-global-project (orig-fun &optional maybe-prompt directory)
-    (funcall orig-fun
-             maybe-prompt
-             (or directory user/global-project)))
-  (with-eval-after-load 'project
-    (advice-add 'project-switch-project :before #'user/set-global-project)
-    (advice-add 'project-current :around #'user/get-global-project)))
-
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
                          ("elpa" . "https://elpa.gnu.org/packages/")))
 (require 'package)
