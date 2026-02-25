@@ -10,7 +10,7 @@ fi
 
 name=$(basename "$dir")
 if ! tmux ls -F '#{session_name}' | grep -q "$name"; then
-    tmux new -d -s "$name" -c "$dir" 'while true; do vim $(fzf) || true; done'
+    tmux new -d -s "$name" -c "$dir" 'emacs'
     tmux new-window -t "$name" -n "shell" -c "$dir"
     tmux new-window -t "$name" -n "agent" -c "$dir" 'kimi'
     tmux select-window -t "${name}:2"

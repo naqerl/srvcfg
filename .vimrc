@@ -1,5 +1,6 @@
 " Disable swap files
 set noswapfile
+set nowrap
 set spell
 
 " Install plugins
@@ -8,6 +9,10 @@ Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 Plug 'tpope/vim-fugitive'
 call plug#end()
+
+let $FZF_DEFAULT_OPTS = '--layout=reverse --preview-window=hidden --bind=ctrl-/:toggle-preview'
+nnoremap <leader>f :GFiles!<CR>
+nnoremap <leader>g :RG!<CR>
 
 " Copy to system clipboard through SSH
 function! GetVisualSelection()
