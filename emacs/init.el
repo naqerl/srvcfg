@@ -22,8 +22,9 @@
 
 (set-terminal-coding-system 'utf-8)
 (set-keyboard-coding-system 'utf-8)
-;; Terminal setup for tmux-direct (truecolor + italics support)
+;; Terminal setup for tmux terms (truecolor + italics support)
 (add-to-list 'term-file-aliases '("tmux-direct" . "xterm-direct"))
+(add-to-list 'term-file-aliases '("tmux-256color" . "xterm-direct"))
 (setq xterm-extra-capabilities '(invisible-text))
 
 ;; Don't override TERM - use what tmux sets
@@ -64,12 +65,10 @@
   (compilation-buffer-name-function (lambda (_) (concat "*" compile-command "*")))
   :bind
   ("<f8>" . user/recompile)
-  ("<f9>" . make)
-  ("<f10>" . user/compile)
+  ("<f9>" . user/compile)
   :config
   (defun user/compile () (interactive) (if (project-current) (project-compile) (compile)))
   (defun user/recompile () (interactive) (if (project-current) (project-recompile) (recompile)))
-  (load (expand-file-name "make-completion" user-emacs-directory))
   (dolist (regex '('(biome-lint "^\\(.*\\):\\([0-9]+\\):\\([0-9]+\\)\s.*\s━+$" 1 2 3 2 1)
                  '(tsc "^\\(.*\\):\\([0-9]+\\):\\([0-9]+\\)\s-\serror\s.*$" 1 2 3 2 1)
                  '(ruff "^ *--> \\([^:]+\\):\\([0-9]+\\):\\([0-9]+\\)$" 1 2 3)))
@@ -164,10 +163,6 @@
   ("C-x g" . magit)
   (:map magit-status-mode-map ("<backtab>" . magit-section-cycle-diffs)))
 
-(use-package embark
-  :ensure t
-  :bind (:map minibuffer-mode-map ("M-." . embark-export)))
-
 (use-package change-inner
   :ensure t
   :bind
@@ -214,22 +209,24 @@ Stores markdown link to it in kill ring."
   (completion-category-defaults nil)
   (completion-category-overrides '((file (styles partial-completion)))))
 
-
 (use-package dumb-jump
   :ensure t
   :config
   (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
 
-(use-package doom-themes
+(use-package gruber-darker-theme
   :ensure t
   :config
-  (load-file (expand-file-name "compline-theme.el" user-emacs-directory))
-  (load-theme 'compline t))
-
+  (load-theme 'gruber-darker t))
 
 (load "term/xterm")
 
 ;; Enable 24-bit color for tmux-direct
 (defun terminal-init-tmux-direct ()
+  (xterm-register-default-colors)
+  (tty-set-up-initial-frame-faces))
+
+;; Most tmux setups expose TERM=tmux-256color.
+(defun terminal-init-tmux-256color ()
   (xterm-register-default-colors)
   (tty-set-up-initial-frame-faces))
