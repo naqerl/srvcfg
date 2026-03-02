@@ -7,13 +7,11 @@
       help-window-select t
       history-length 25
       use-dialog-box nil
-      dired-dwim-target t
       electric-indent-inhibit t
       backward-delete-char-untabify-method 'hungry
       display-line-numbers-type 'visual
       indent-tabs-mode nil
       custom-file (expand-file-name ".emacs.custom.el" user-emacs-directory)
-      dired-kill-when-opening-new-dired-buffer t
       remote-file-name-inhibit-locks t
       tramp-use-scp-direct-remote-copying t
       remote-file-name-inhibit-auto-save-visited t
@@ -37,12 +35,22 @@
 (global-auto-revert-mode 1)
 (savehist-mode 1)
 (save-place-mode 1)
+
+;; Preserve cursor position when reverting buffers
+(defun user/revert-buffer-preserve-point (&rest _)
+  "Preserve cursor position after revert-buffer."
+  (let ((point (point))
+        (window-start (window-start)))
+    (run-at-time 0 nil
+                 (lambda ()
+                   (goto-char point)
+                   (set-window-start (selected-window) window-start)))))
+(advice-add 'revert-buffer :after #'user/revert-buffer-preserve-point)
 (winner-mode 1)
 (electric-indent-mode 1)
 (menu-bar-mode -1)
 (scroll-bar-mode -1)
 (tool-bar-mode -1)
-(put 'dired-find-alternate-file 'disabled nil)
 
 ;; Builtin packages setup
 (use-package which-key
@@ -83,6 +91,19 @@
   :custom
   (ls-lisp-dirs-first t)
   (ls-lisp-use-insert-directory-program nil))
+
+(use-package dired
+  :custom
+  dired-dwim-target t
+  dired-kill-when-opening-new-dired-buffer t
+  :config
+  (put 'dired-find-alternate-file 'disabled nil)
+  :hook
+  (dired-mode . (lambda () (dired-hide-details-mode 1))))
+
+(use-package whitespace
+  :config
+  (add-hook 'before-save-hook  'whitespace-cleanup))
 
 ;; Custom built-in binds
 (use-package emacs
@@ -157,14 +178,14 @@
   :config
   (defun user/go-mode-hook ()
     (setq tab-width 8
-	  standard-indent 8
-	  indent-tabs-mode nil))
+          standard-indent 8
+          indent-tabs-mode nil))
   (defalias 'user/go-insert-err-check
     (kmacro "C-e RET i f SPC e r r SPC ! = SPC n i l SPC { RET r e t u r n SPC e r r"))
   :hook
   (go-mode . user/go-mode-hook)
   :bind (:map go-mode-map
-	      ("C-c C-e" . user/go-insert-err-check)))
+              ("C-c C-e" . user/go-insert-err-check)))
 
 (use-package markdown-mode
   :ensure t
@@ -200,6 +221,61 @@ Stores markdown link to it in kill ring."
   :ensure t
   :config
   (load-theme 'gruber-darker t))
+
+(use-package agent-shell
+  :ensure t
+  :init
+  (setq
+   agent-shell-preferred-agent-config 'kimi-cli
+   agent-shell-context-sources '(region))
+  :config
+  (defun user/agent-shell-style-header-face ()
+    "Style agent-shell header line without underline."
+    (setq-local face-remapping-alist
+                (cons '(header-line (:inherit header-line :weight semibold :underline nil))
+                      (assq-delete-all 'header-line face-remapping-alist))))
+
+  (add-hook 'agent-shell-mode-hook #'user/agent-shell-style-header-face)
+  (add-hook 'agent-shell-viewport-view-mode-hook #'user/agent-shell-style-header-face)
+
+  (defcustom user/agent-shell-kimi-acp-command
+    '("kimi" "acp")
+    "Command and parameters for the Kimi ACP client."
+    :type '(repeat string)
+    :group 'agent-shell)
+
+  (defcustom user/agent-shell-kimi-environment
+    nil
+    "Environment variables for the Kimi ACP client."
+    :type '(repeat string)
+    :group 'agent-shell)
+
+  (defun user/agent-shell-kimi-make-client (buffer)
+    "Create a Kimi ACP client with BUFFER as context."
+    (unless buffer
+      (error "Missing required argument: :buffer"))
+    (agent-shell--make-acp-client
+     :command (car user/agent-shell-kimi-acp-command)
+     :command-params (cdr user/agent-shell-kimi-acp-command)
+     :environment-variables user/agent-shell-kimi-environment
+     :context-buffer buffer))
+
+  (defun agent-shell-kimi-welcome-message (_config)
+    "Return Kimi welcome message."
+    (format "\n🌙 Welcome to Kimi (Moonshot AI)\n\n"))
+
+  ;; Add Kimi CLI as an ACP agent
+  (add-to-list 'agent-shell-agent-configs
+               (agent-shell-make-agent-config
+                :identifier 'kimi-cli
+                :mode-line-name "Kimi"
+                :buffer-name "Kimi"
+                :shell-prompt "Kimi> "
+                :shell-prompt-regexp "^Kimi> "
+                :client-maker 'user/agent-shell-kimi-make-client
+                :welcome-function #'agent-shell-kimi-welcome-message
+                :default-model-id (lambda () nil)
+                :install-instructions "Install kimi-cli: pip install kimi-cli")))
 
 (load "term/xterm")
 
