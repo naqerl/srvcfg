@@ -19,11 +19,7 @@ export EDITOR=emacs
 
 env_path="$HOME/.env"
 test -f "$env_path" && source "$env_path"
-[[ -f $(which fzf) ]] && eval "$(fzf --bash)"
 
 if [[ -n "$SSH_CLIENT" && -z "$TMUX" && -z "$INSIDE_EMACS" ]]; then
     tmux new -A -D -s main
 fi
-
-alias codex="npx @openai/codex"
-
