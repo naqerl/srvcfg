@@ -1,3 +1,4 @@
+;; -*- lexical-binding: t; -*-
 (setq-default make-backup-files nil
       truncate-lines t
       create-lockfiles nil
@@ -49,8 +50,6 @@
 (winner-mode 1)
 (electric-indent-mode 1)
 (menu-bar-mode -1)
-(scroll-bar-mode -1)
-(tool-bar-mode -1)
 
 ;; Builtin packages setup
 (use-package which-key
@@ -77,9 +76,9 @@
   :config
   (defun user/compile () (interactive) (if (project-current) (project-compile) (compile)))
   (defun user/recompile () (interactive) (if (project-current) (project-recompile) (recompile)))
-  (dolist (regex '('(biome-lint "^\\(.*\\):\\([0-9]+\\):\\([0-9]+\\)\s.*\s━+$" 1 2 3 2 1)
-                 '(tsc "^\\(.*\\):\\([0-9]+\\):\\([0-9]+\\)\s-\serror\s.*$" 1 2 3 2 1)
-                 '(ruff "^ *--> \\([^:]+\\):\\([0-9]+\\):\\([0-9]+\\)$" 1 2 3)))
+  (dolist (regex '((biome-lint "^\\(.*\\):\\([0-9]+\\):\\([0-9]+\\)\s.*\s━+$" 1 2 3 2 1)
+                   (tsc "^\\(.*\\):\\([0-9]+\\):\\([0-9]+\\)\s-\serror\s.*$" 1 2 3 2 1)
+                   (ruff "^ *--> \\([^:]+\\):\\([0-9]+\\):\\([0-9]+\\)$" 1 2 3)))
   (add-to-list 'compilation-error-regexp-alist-alist regex)
   (add-to-list 'compilation-error-regexp-alist-alist (car regex))))
 
@@ -135,6 +134,21 @@
   ("C-M-p" . previous-buffer)
   ("C-M-n" . next-buffer))
 
+(use-package org
+  :bind
+  ("C-c c a" . org-capture)
+  :custom
+  (org-capture-templates
+      '(("d" "Daily" entry
+         (file (lambda () (format "~/org/daily/%s.org" (format-time-string "%Y-%m-%d"))))
+         "* %?\n%U")
+        ("a" "Agent Task" entry
+         (file+headline
+          (lambda ()
+            (expand-file-name ".tasks/notes.org" (project-root (project-current))))
+          "Tasks")
+         "* TODO %?\n  %u\n  %a"))))
+
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
                          ("elpa" . "https://elpa.gnu.org/packages/")))
 (require 'package)
@@ -142,9 +156,6 @@
 
 (use-package diminish :ensure t)
 (use-package f :ensure t)
-(use-package clipetty
-  :ensure t
-  :bind ("M-w" . clipetty-kill-ring-save))
 (use-package golden-ratio
   :ensure t
   :config
@@ -224,10 +235,11 @@ Stores markdown link to it in kill ring."
 
 (use-package agent-shell
   :ensure t
+  :bind
+  ("C-x a" . agent-shell)
   :init
   (setq
-   agent-shell-preferred-agent-config 'kimi-cli
-   agent-shell-context-sources '(region))
+   agent-shell-context-sources '(region file error))
   :config
   (defun user/agent-shell-style-header-face ()
     "Style agent-shell header line without underline."
@@ -236,46 +248,7 @@ Stores markdown link to it in kill ring."
                       (assq-delete-all 'header-line face-remapping-alist))))
 
   (add-hook 'agent-shell-mode-hook #'user/agent-shell-style-header-face)
-  (add-hook 'agent-shell-viewport-view-mode-hook #'user/agent-shell-style-header-face)
-
-  (defcustom user/agent-shell-kimi-acp-command
-    '("kimi" "acp")
-    "Command and parameters for the Kimi ACP client."
-    :type '(repeat string)
-    :group 'agent-shell)
-
-  (defcustom user/agent-shell-kimi-environment
-    nil
-    "Environment variables for the Kimi ACP client."
-    :type '(repeat string)
-    :group 'agent-shell)
-
-  (defun user/agent-shell-kimi-make-client (buffer)
-    "Create a Kimi ACP client with BUFFER as context."
-    (unless buffer
-      (error "Missing required argument: :buffer"))
-    (agent-shell--make-acp-client
-     :command (car user/agent-shell-kimi-acp-command)
-     :command-params (cdr user/agent-shell-kimi-acp-command)
-     :environment-variables user/agent-shell-kimi-environment
-     :context-buffer buffer))
-
-  (defun agent-shell-kimi-welcome-message (_config)
-    "Return Kimi welcome message."
-    (format "\n🌙 Welcome to Kimi (Moonshot AI)\n\n"))
-
-  ;; Add Kimi CLI as an ACP agent
-  (add-to-list 'agent-shell-agent-configs
-               (agent-shell-make-agent-config
-                :identifier 'kimi-cli
-                :mode-line-name "Kimi"
-                :buffer-name "Kimi"
-                :shell-prompt "Kimi> "
-                :shell-prompt-regexp "^Kimi> "
-                :client-maker 'user/agent-shell-kimi-make-client
-                :welcome-function #'agent-shell-kimi-welcome-message
-                :default-model-id (lambda () nil)
-                :install-instructions "Install kimi-cli: pip install kimi-cli")))
+  (add-hook 'agent-shell-viewport-view-mode-hook #'user/agent-shell-style-header-face))
 
 (load "term/xterm")
 
@@ -288,3 +261,7 @@ Stores markdown link to it in kill ring."
 (defun terminal-init-tmux-256color ()
   (xterm-register-default-colors)
   (tty-set-up-initial-frame-faces))
+
+(use-package php-mode
+  :ensure t
+  :mode "\\.php\\'")
