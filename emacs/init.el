@@ -19,6 +19,10 @@
       split-width-threshold 1 ;; Prever side by side splits
       next-screen-context-lines 2)
 
+(menu-bar-mode -1)
+(toggle-scroll-bar -1)
+(tool-bar-mode -1)
+
 (set-terminal-coding-system 'utf-8)
 (set-keyboard-coding-system 'utf-8)
 ;; Terminal setup for tmux terms (truecolor + italics support)
