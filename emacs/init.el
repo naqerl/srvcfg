@@ -93,8 +93,8 @@
 
 (use-package dired
   :custom
-  dired-dwim-target t
-  dired-kill-when-opening-new-dired-buffer t
+  (dired-dwim-target t)
+  (dired-kill-when-opening-new-dired-buffer t)
   :config
   (put 'dired-find-alternate-file 'disabled nil)
   :hook
@@ -158,6 +158,7 @@
 (use-package f :ensure t)
 (use-package golden-ratio
   :ensure t
+  :diminish 'golden-ratio-mode
   :config
   (golden-ratio-mode 1))
 
@@ -250,18 +251,10 @@ Stores markdown link to it in kill ring."
   (add-hook 'agent-shell-mode-hook #'user/agent-shell-style-header-face)
   (add-hook 'agent-shell-viewport-view-mode-hook #'user/agent-shell-style-header-face))
 
-(load "term/xterm")
-
-;; Enable 24-bit color for tmux-direct
-(defun terminal-init-tmux-direct ()
-  (xterm-register-default-colors)
-  (tty-set-up-initial-frame-faces))
-
-;; Most tmux setups expose TERM=tmux-256color.
-(defun terminal-init-tmux-256color ()
-  (xterm-register-default-colors)
-  (tty-set-up-initial-frame-faces))
-
-(use-package php-mode
+(use-package eat
   :ensure t
-  :mode "\\.php\\'")
+  :diminish 'eat-eshell-mode
+  :config
+  (add-hook 'eshell-mode-hook 'eat-eshell-mode))
+
+(load "term/xterm")
