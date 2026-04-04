@@ -192,10 +192,10 @@ Stores markdown link to it in the kill ring."
 
 ;; End region -- Major modes
 
-(use-package gruber-darker-theme
+(use-package solarized-theme
   :ensure t
   :config
-  (load-theme 'gruber-darker t))
+  (load-theme 'solarized-dark t))
 
 (define-derived-mode yao-mode comint-mode "YAO"
   "Major mode for YAO shell."
