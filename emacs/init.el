@@ -87,18 +87,23 @@
   ("C-." . next-buffer))
 
 (use-package org
-  :config
-  (defun user/org-capture-tasks-note()
-    "Runs org-capture with agent task template."
-    (interactive)
-    (if (project-current)
-        (org-capture nil "a")
-      (message "project-current is not set")))
   :bind
-  ("C-x C-a" . user/org-capture-tasks-note)
+  ("C-c a" . org-capture)
   :custom
   (org-capture-templates
-   '(("a" "Agent Task" entry
+   '(("b" "Bookmark" entry
+      (file+headline
+       (lambda ()
+         (expand-file-name "bookmarks.org" org-directory))
+       "Bookmarks")
+      "* %? :bookmark:\n%u")
+     ;; TODO: Add function which will calucalte next date for the active agenda task as the (+ (day 1) (last-date 'tweet))
+     ("x" "X tweet" entry
+      (file
+       (lambda ()
+         (expand-file-name "tweets.org" org-directory)))
+      "* TODO %? :tweet:\n")
+     ("p" "Project Task" entry
       (file+headline
        (lambda ()
          (expand-file-name ".tasks/notes.org" (project-root (project-current))))
@@ -225,7 +230,7 @@ If region is active, inserts snippet at cursor position."
       (make-comint-in-buffer "yao" buffer-name yao-binary)
       (with-current-buffer buffer-name
         (yao-mode)))
-    (pop-to-buffer buffer-name)
+    (switch-to-buffer buffer-name)
     (when snippet
       (goto-char (process-mark (get-buffer-process buffer-name)))
       (save-excursion
@@ -241,3 +246,10 @@ If region is active, inserts snippet at cursor position."
                       url))
          (response (shell-command-to-string cmd)))
     (message "Sent kill-ring content to %s" url)))
+
+(use-package geiser-guile
+  :ensure t)
+
+(use-package guix
+  :after geiser-guile
+  :ensure t)
