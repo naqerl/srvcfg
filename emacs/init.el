@@ -13,7 +13,8 @@
       remote-file-name-inhibit-auto-save-visited t
       tramp-use-scp-direct-remote-copying t
       split-width-threshold 1 ;; Prever side by side splits
-      compile-command "")
+      compile-command ""
+      tab-bar-show nil)
 
 (put 'upcase-region 'disabled nil)
 
