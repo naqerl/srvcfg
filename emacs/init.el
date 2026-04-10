@@ -198,11 +198,6 @@ Stores markdown link to it in the kill ring."
 
 ;; End region -- Major modes
 
-(use-package solarized-theme
-  :ensure t
-  :config
-  (load-theme 'solarized-dark t))
-
 (define-derived-mode yao-mode comint-mode "YAO"
   "Major mode for YAO shell."
   (setq-local comint-prompt-regexp "^λ "))
