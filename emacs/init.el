@@ -14,7 +14,8 @@
       tramp-use-scp-direct-remote-copying t
       split-width-threshold 1 ;; Prever side by side splits
       compile-command ""
-      tab-bar-show nil)
+      tab-bar-show nil
+      frame-background-mode 'dark)
 
 (put 'upcase-region 'disabled nil)
 
@@ -249,3 +250,11 @@ If region is active, inserts snippet at cursor position."
 (use-package guix
   :after geiser-guile
   :ensure t)
+
+(use-package eat
+  :ensure t
+  :vc (:url "https://codeberg.org/akib/emacs-eat")
+  :config
+  (add-hook 'eshell-load-hook #'eat-eshell-mode))
+
+(load-theme 'modus-vivendi t)
