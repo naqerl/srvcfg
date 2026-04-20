@@ -17,6 +17,8 @@
       tab-bar-show nil
       frame-background-mode 'dark)
 
+(setenv "EDITOR" "emacsclient")
+
 (put 'upcase-region 'disabled nil)
 
 (blink-cursor-mode 1)
@@ -88,6 +90,10 @@
   ("C-," . previous-buffer)
   ("C-." . next-buffer))
 
+(use-package time
+  :config
+  (display-time-mode 1))
+
 (use-package org
   :bind
   ("C-c a" . org-capture)
@@ -126,10 +132,6 @@
   :ensure t
   :commands keycast-mode-line-mode)
 
-(use-package sudo-edit
-  :ensure t
-  :commands sudo-edit)
-
 (use-package golden-ratio
   :ensure t
   :diminish 'golden-ratio-mode
@@ -162,7 +164,9 @@
   (defun user/go-mode-hook ()
     (setq tab-width 8
           standard-indent 8
-          indent-tabs-mode t))
+          indent-tabs-mode t
+          fill-column 80)
+    (display-fill-column-indicator-mode t))
   (defalias 'user/go-insert-err-check
     (kmacro "C-e RET i f SPC e r r SPC ! = SPC n i l SPC { RET r e t u r n SPC e r r"))
   :hook
@@ -258,3 +262,6 @@ If region is active, inserts snippet at cursor position."
   (add-hook 'eshell-load-hook #'eat-eshell-mode))
 
 (load-theme 'modus-vivendi t)
+
+(load (expand-file-name "dashboard.el" user-emacs-directory) t)
+(load (expand-file-name "opencode.el" user-emacs-directory) t)
